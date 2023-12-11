@@ -1,24 +1,33 @@
 import 'dart:html';
-import 'dart:convert';
 
 void main() {
- fetchDataImage();
-}
+ final url = 'https://w0.peakpx.com/wallpaper/527/951/HD-wallpaper-shinra-tensei-konoha-naruto-pain-shippuden.jpg';
 
-Future<void> fetchDataImage() async {
- try {
-    var response = await window.fetch(
-        'https://m.media-amazon.com/images/I/81IVHuEQXZL._AC_UF1000,1000_QL80_.jpg',
-        {'headers': {'Authorization': 'Client-ID YOUR_ACCESS_KEY'}});
+ HttpRequest.request(
+    url,
+    requestHeaders: {'Content-Type': 'image/jpeg'},
+    responseType: 'blob',
+    onProgress: (event) {
+      if (event.lengthComputable) {
+        print('Received ${event.loaded} of ${event.total} bytes');
+      } else {
+        print('Received some bytes: ${event.loaded}');
+      }
+    },
+    onLoadStart: (event) {
+      print('Request started');
+    },
+    onLoadEnd: (event) {
+      print('Request finished');
 
-    if (!response.ok) {
-      throw Exception('Server Error');
-    }
-
-    var data = await response.json();
-    var imageUrl = data['urls']['small'];
-    querySelector('#image-container')?.setAttribute('src', imageUrl);
- } catch (e) {
-    print('Error: $e');
- }
+      final blob = event.target.response as Blob;
+      final objectUrl = Url.createObjectUrl(blob);
+      final imageElement = ImageElement(src: objectUrl);
+      document.body.append(imageElement);
+    },
+    onError: (Object obj) {
+      final error = obj as Error;
+      print('Request failed with error: $error');
+    },
+ );
 }
