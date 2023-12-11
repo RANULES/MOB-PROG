@@ -1,0 +1,24 @@
+import 'dart:html';
+import 'dart:convert';
+
+void main() {
+ fetchDataImage();
+}
+
+Future<void> fetchDataImage() async {
+ try {
+    var response = await window.fetch(
+        'https://m.media-amazon.com/images/I/81IVHuEQXZL._AC_UF1000,1000_QL80_.jpg',
+        {'headers': {'Authorization': 'Client-ID YOUR_ACCESS_KEY'}});
+
+    if (!response.ok) {
+      throw Exception('Server Error');
+    }
+
+    var data = await response.json();
+    var imageUrl = data['urls']['small'];
+    querySelector('#image-container')?.setAttribute('src', imageUrl);
+ } catch (e) {
+    print('Error: $e');
+ }
+}
